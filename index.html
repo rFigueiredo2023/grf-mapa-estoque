@@ -138,7 +138,7 @@ ol.passos b { font-weight: 600; }
   <header>
     <div class="eyebrow">Estoque em dois níveis · situação em 03/11/2026</div>
     <h1>Mapa do Estoque GRF</h1>
-    <p class="lead">Da esquerda para a direita: a matéria-prima entra, a máquina faz a tira ou o DryPack, a tira espera a caixa, a caixa fecha e o produto sai na nota. Cada círculo coral é uma dúvida que falta responder, ligada à etapa que ela trava. Toque num ponto para ver o detalhe.</p>
+    <p class="lead">Da esquerda para a direita: a matéria-prima entra, a máquina faz a tira ou o DryPack, a tira espera a mesa de amarração, a caixa fecha e o produto sai na nota. Cada círculo coral é uma dúvida que falta responder, ligada à etapa que ela trava. Toque num ponto para ver o detalhe.</p>
     <div class="summary" id="summary"></div>
   </header>
 
@@ -146,12 +146,12 @@ ol.passos b { font-weight: 600; }
     <div class="legend">
       <span><i class="sw" style="border-color:var(--gold)"></i>Estoque andando</span>
       <span><i class="sw" style="border-color:var(--teal);border-top-style:dashed"></i>Contagem e inventário corrigem</span>
-      <span><i class="sw" style="border-color:var(--muted);border-top-style:dotted"></i>Ainda não existe no sistema</span>
       <span><i class="dot" style="background:var(--coral-soft);border:2px solid var(--coral)"></i>Dúvida para você</span>
       <span><i class="dot" style="background:var(--violet-soft);border:2px solid var(--violet)"></i>Assunto do contador</span>
       <span><i class="dot" style="border:2px solid var(--gold)"></i>Feito em 03/11 (no Mac)</span>
+      <span><i class="dot" style="border:2px dashed var(--muted)"></i>Ainda não existe</span>
     </div>
-    <div class="map-scroll"><svg class="map" id="map" viewBox="0 0 1520 960" role="img" aria-label="Fluxo: fornecedores, doca, matéria-prima, máquinas, apontamento de sachê, tira e DryPack, apontamento de caixa, caixa pronta, estoque de produto pronto, pedido, nota fiscal e cliente"></svg></div>
+    <div class="map-scroll"><svg class="map" id="map" viewBox="0 0 1520 960" role="img" aria-label="Fluxo: fornecedores, doca, matéria-prima e consumíveis, máquinas, apontamento de sachê, tira e DryPack, apontamento de caixa, caixa pronta, estoque de produto pronto, pedido, nota fiscal e cliente"></svg></div>
     <p class="hint">No celular, arraste o mapa para o lado.</p>
   </section>
 
@@ -160,14 +160,14 @@ ol.passos b { font-weight: 600; }
     <aside class="panel">
       <h2>O caminho, em seis passos</h2>
       <ol class="passos">
-        <li><b>Entra.</b> A matéria-prima chega, a logística confere no tablet e dá entrada.</li>
+        <li><b>Entra.</b> Matéria-prima ou consumível chega (a OFC manda a bobina já impressa); a logística confere no tablet e dá entrada.</li>
         <li><b>A máquina faz.</b> Tira (DryBOX) ou DryPack. O chefe de produção lança contador e refugo; a matéria-prima baixa pela ficha por sachê.</li>
-        <li><b>Espera.</b> A tira fica no saldo, em sachês, até a caixa. O DryPack já está pronto para venda.</li>
-        <li><b>Fecha a caixa.</b> Sai 72 sachês de tira, mais caixa de papelão, saco e abraçadeira.</li>
+        <li><b>Espera.</b> A tira cai na caixa grande do dia e espera a mesa de amarração. O DryPack já está pronto para venda.</li>
+        <li><b>Amarra e fecha a caixa.</b> Os amarradores furam a tira, passam a corda, põem o gancho e montam a caixa: saem 72 sachês de tira, gancho, corda, caixa de papelão, saco e abraçadeira.</li>
         <li><b>Separa o pedido.</b> "Separado/Produzido" baixa o produto pronto, das duas empresas juntas.</li>
         <li><b>Sai.</b> O financeiro emite a nota e o cliente leva.</li>
       </ol>
-      <p class="loop">Toda sexta, a contagem cega confere a matéria-prima e corrige o saldo. Na virada, o inventário físico vira o saldo inicial de tudo.</p>
+      <p class="loop">Consumível baixa à mão (ex.: 5 rolos de fita adesiva). Toda sexta, a contagem cega confere matéria-prima e consumível e corrige o saldo. Na virada, o inventário físico vira o saldo inicial de tudo.</p>
     </aside>
   </section>
 
@@ -184,30 +184,32 @@ ol.passos b { font-weight: 600; }
   var ST = { existe: 'Já existe no sistema novo', novo: 'Feito em 03/11, no Mac', falta: 'Ainda não existe' };
 
   var N = {
-    forn: { x: 40, y: 50, t: 'Fornecedores', s: ['Cloreto, amido, SSMMS, Tyvek,', 'filme, gancho, corda, bentonita'], st: 'existe',
-      info: 'Compra de matéria-prima e embalagem. O prazo de cada fornecedor fica em Compras.' },
-    doca: { x: 40, y: 200, t: 'Recebimento na doca', s: ['Logística no tablet: conta,', 'fotografa a nota, dá entrada'], st: 'existe',
-      info: 'A logística conta a carga antes de ver a nota (conferência cega), fotografa a nota física e dá entrada no estoque. Só nota com material de produção aparece no tablet; o resto fica com o escritório.' },
-    mp: { x: 40, y: 390, t: 'Estoque de matéria-prima', s: ['Saldo = entradas menos', 'as baixas dos apontamentos'], st: 'existe',
-      info: 'O saldo baixa sozinho pela ficha técnica, no apontamento de sachê e no de caixa. Material de uso variável (stretch, fita, arame) não baixa por ficha: a contagem de sexta revela o consumo.' },
-    ofc: { x: 40, y: 610, t: 'OFC (impressão)', s: ['SSMMS 785 mm vai crua e volta', 'em duas bobinas de 375 mm'], st: 'falta',
-      info: 'A bobina de 785 mm vai crua para a OFC imprimir e volta cortada em duas de 375 mm, que alimentam a máquina de 4 vias. No estoque serão dois materiais: a 785 mm crua e a 375 mm impressa. O sistema ainda não tem esse movimento de ida e volta.' },
+    forn: { x: 40, y: 50, t: 'Fornecedores', s: ['Inclui a OFC, que manda', 'a bobina já impressa'], st: 'existe',
+      info: 'Compra de matéria-prima, consumível e embalagem. A OFC entra como fornecedor: a bobina de SSMMS comprada da Argetex vai para a OFC e chega aqui impressa, com entrada normal de matéria-prima. A nota da Argetex dessa bobina não entra no estoque, senão a bobina contaria duas vezes.' },
+    doca: { x: 40, y: 200, t: 'Recebimento na doca', s: ['Logística no tablet: conta,', 'fotografa, anota, dá entrada'], st: 'existe',
+      info: 'A logística conta a carga antes de ver a nota (conferência cega), fotografa a nota física e dá entrada. A entrada vai para matéria-prima ou para consumível, conforme o cadastro do material. Só nota com material de produção aparece no tablet; o resto fica com o escritório.' },
+    mp: { x: 40, y: 390, t: 'Matéria-prima', s: ['Baixa sozinha pela ficha', 'a cada apontamento'], st: 'existe',
+      info: 'Matéria-prima é o que está ligado à fabricação do produto final: cloreto, amido, SSMMS, Tyvek, plástico, adesivo, bentonita, gancho, corda, caixa, saco e abraçadeira. Ela sai do estoque sozinha, pela ficha técnica, no apontamento de sachê e no de caixa.' },
+    cons: { x: 40, y: 610, t: 'Consumíveis', s: ['Baixa manual: ex. 5 rolos', 'de fita adesiva'], st: 'existe',
+      info: 'Consumível não baixa por apontamento. A saída é lançada à mão em Lançamentos de Matéria-Prima, com motivo Consumo (ex.: 5 rolos de fita adesiva), e a contagem de sexta confere o resto. Hoje esse lançamento é do escritório e do chefe de produção; a logística não tem botão para isso no tablet.' },
     maq: { x: 345, y: 60, t: 'Máquinas 01, 02 e 03', s: ['Tiras DryBOX e DryPack', 'acima de 66 g'], st: 'existe',
-      info: 'Fazem as tiras do DryBOX: sachê de 125 g (90 g de cloreto + 35 g de amido), em SSMMS ou Tyvek. Também fazem DryPack acima de 66 g, com SSMMS nas duas faces.' },
+      info: 'Fazem as tiras do DryBOX em três receitas: SSMMS + plástico (PET+PEBD), só Tyvek, ou Tyvek + colante. O sachê tem 125 g (90 g de cloreto + 35 g de amido). Também fazem DryPack acima de 66 g, com SSMMS nas duas faces.',
+      dec: ['Tyvek não leva plástico: o plástico só vai com SSMMS'] },
     vias: { x: 345, y: 220, t: 'Máquina de 4 vias', s: ['DryPack de 1 a 66 g,', 'com a bobina impressa'], st: 'existe',
-      info: 'DryPack de 1 a 66 g. Usa a bobina impressa de 375 mm, dividida em 4 faixas.' },
+      info: 'DryPack de 1 a 66 g. Usa a bobina impressa que vem da OFC (a de 785 mm cortada em duas de 375 mm), dividida em 4 faixas.' },
     apsache: { x: 345, y: 420, t: 'Apontamento de sachê', s: ['Chefe de produção, fim do dia:', 'contador − refugo = bons'], st: 'novo',
       info: 'O chefe de produção lança no tablet, no fim do dia, por máquina: o produto que saiu (tira ou DryPack), o contador e o refugo. Os bons entram no saldo. A matéria-prima baixa pela ficha por sachê, sobre bons + refugo.',
       dec: ['Um turno só: o campo turno saiu', 'Cada pessoa entra com o próprio usuário no tablet', 'A lista soma bons e refugo e mostra a perda do período'] },
     refugo: { x: 345, y: 640, t: 'Refugo vai para o lixo', s: ['Mal selado, vazado, tira cortada,', 'início de máquina'], st: 'novo',
-      info: 'O refugo não entra no estoque, mas gastou insumo, então baixa matéria-prima. Filtrando o mês na lista de Produção de Sachês, o rodapé mostra a perda do mês (refugo ÷ contador).' },
-    tira: { x: 655, y: 230, t: 'Tira (espera a caixa)', s: ['Saldo em sachês; tiras de 3, 4,', '6, 8 ou individual'], st: 'novo',
-      info: 'Semiacabado: sai da máquina e espera a caixa, que pode fechar no dia seguinte. O saldo é em sachês e aparece também em tiras. Caixas com a mesma tira puxam do mesmo saldo. A tira nunca aparece em orçamento, pedido ou nota.',
-      dec: ['Ficha por sachê: 90 g de cloreto, 35 g de amido, não-tecido, filme', '1 gancho e 1 corda por tira', 'Duas receitas: SSMMS e Tyvek (a com sódio saiu)'] },
+      info: 'O refugo é descartado no lixo. Não entra no estoque, mas gastou insumo, então baixa matéria-prima. Filtrando o mês na lista de Produção de Sachês, o rodapé mostra a perda do mês (refugo ÷ contador).' },
+    tira: { x: 655, y: 230, t: 'Tira (espera a caixa)', s: ['Na caixa grande do dia, até', 'a mesa de amarração'], st: 'novo',
+      info: 'A produção do dia cai numa caixa grande e espera a mesa de amarração, que pode ser no dia seguinte. No sistema é o saldo da tira, em sachês (aparece também em tiras). Caixas com a mesma tira puxam do mesmo saldo. A tira nunca aparece em orçamento, pedido ou nota.',
+      dec: ['Ficha por sachê: 90 g de cloreto, 35 g de amido, não-tecido e filme', 'Três receitas: SSMMS + plástico, só Tyvek, Tyvek + colante'] },
     drypack: { x: 655, y: 500, t: 'DryPack pronto', s: ['Vendido por sachê;', 'embalagem fixa por produto'], st: 'novo',
       info: 'Sachê de bentonita vendido por sachê. A embalagem é fixa por produto (tabela DRYPACK de 29/10: 33 g = 352, 5 g = 1.500, 500 g = 25). Entra pronto no estoque no apontamento de sachê.' },
-    apcaixa: { x: 960, y: 150, t: 'Apontamento de caixa', s: ['72 sachês de tira + caixa,', 'saco e abraçadeira'], st: 'novo',
-      info: 'O amarrador fecha a caixa e a logística lança no tablet. Cada caixa tira 72 sachês do saldo da tira e baixa caixa de papelão, saco e abraçadeira (a abraçadeira fecha o saco das tiras). Sem tira no saldo, a caixa é registrada e aparece um aviso.' },
+    apcaixa: { x: 960, y: 150, t: 'Mesa de amarração', s: ['Fura, passa a corda, põe o', 'gancho e monta a caixa'], st: 'novo',
+      info: 'Os amarradores furam cada tira, passam a cordinha, põem o gancho e montam a caixa; a logística lança no tablet. Cada caixa tira 72 sachês do saldo da tira e baixa gancho e corda (1 de cada por tira), caixa de papelão, saco e abraçadeira (a abraçadeira fecha o saco das tiras). Sem tira no saldo, a caixa é registrada e aparece um aviso.',
+      dec: ['Gancho e corda saem aqui, na mesa, não na máquina'] },
     caixa: { x: 960, y: 360, t: 'Caixa DryBOX pronta', s: ['Sempre 72 sachês e 9 kg;', 'muda só o arranjo'], st: 'novo',
       info: 'Toda caixa tem 72 sachês e 9 kg. Muda o arranjo: 24 tiras de 3, 18 de 4, 12 de 6, 9 de 8 ou 72 individuais (SSMMS, Tyvek ou colante).' },
     pronto: { x: 1250, y: 110, t: 'Estoque de produto pronto', s: ['Um saldo só para GRF', 'Brasil e Dessecantes'], st: 'existe',
@@ -217,26 +219,26 @@ ol.passos b { font-weight: 600; }
     nf: { x: 1250, y: 450, t: 'Nota fiscal', s: ['Sempre pelo financeiro,', 'GRF Brasil ou Dessecantes'], st: 'existe',
       info: 'Só o financeiro emite a nota, por qualquer uma das duas empresas. A logística não emite.' },
     cliente: { x: 1250, y: 620, t: 'Cliente', s: ['Coleta ou entrega'], st: 'existe', info: 'O produto sai da fábrica.' },
-    contagem: { x: 345, y: 830, t: 'Contagem de sexta', s: ['Contagem cega no tablet;', 'hoje só matéria-prima'], st: 'existe',
-      info: 'Toda sexta às 06:30 abre uma contagem cega: quem conta não vê o saldo do sistema. Falta vira consumo ou quebra, sobra vira ajuste. Hoje cobre só matéria-prima.' },
+    contagem: { x: 345, y: 830, t: 'Contagem de sexta', s: ['Contagem cega no tablet;', 'hoje só materiais'], st: 'existe',
+      info: 'Toda sexta às 06:30 abre uma contagem cega: quem conta não vê o saldo do sistema. Na matéria-prima, falta é quebra ou apontamento errado; no consumível, a falta é o consumo que ninguém lançou. Sobra vira ajuste. Hoje cobre só matéria-prima e consumível.' },
     virada: { x: 960, y: 830, t: 'Virada e inventário', s: ['Cadastros vão; a operação', 'de hoje fica para trás'], st: 'falta',
-      info: 'O sistema novo vai para produção levando os cadastros de hoje: 536 clientes, 637 contatos, 809 atendimentos, 25 usuários, 30 produtos, 17 matérias-primas e 5 máquinas. A operação fica para trás: 253 pedidos, 1.254 apontamentos e os saldos. Você faz o inventário e ele vira o saldo inicial.',
+      info: 'O sistema novo vai para produção levando os cadastros de hoje: 536 clientes, 637 contatos, 809 atendimentos, 25 usuários, 30 produtos, 17 materiais e 5 máquinas. A operação fica para trás: 253 pedidos, 1.254 apontamentos e os saldos. Você faz o inventário de matéria-prima, consumível, tira e produto pronto, e ele vira o saldo inicial.',
       dec: ['Copiar o banco atual para um novo e atualizar a cópia; o painel atual fica como arquivo', 'Preencher o código IBGE dos clientes antes do primeiro orçamento', 'Manter os 22 DryPack e recadastrar as caixas DryBOX pela família'] }
   };
 
   var L = [
     { a: 'forn', b: 'doca', f: 'b', t: 't', k: 'flow', lb: 'compra' },
     { a: 'doca', b: 'mp', f: 'b', t: 't', k: 'flow', lb: 'entrada' },
-    { a: 'mp', b: 'ofc', f: 'b', t: 't', k: 'falta', lb: 'vai crua, volta impressa' },
-    { a: 'mp', b: 'maq', f: 'r', t: 'l', k: 'flow', lb: 'insumos da tira' },
-    { a: 'mp', b: 'vias', f: 'r', t: 'l', k: 'flow', lb: 'bentonita' },
+    { a: 'doca', b: 'cons', f: 'l', t: 'l', k: 'flow', lb: 'entrada', lt: 0.75, c1: [6, 245], c2: [6, 655] },
+    { a: 'mp', b: 'maq', f: 'r', t: 'l', k: 'flow', lb: 'insumos do sachê' },
+    { a: 'mp', b: 'vias', f: 'r', t: 'l', k: 'flow', lb: 'bentonita, bobina impressa' },
     { a: 'maq', b: 'apsache', f: 'l', t: 'l', k: 'flow', c1: [300, 105], c2: [300, 465] },
     { a: 'vias', b: 'apsache', f: 'b', t: 't', k: 'flow' },
     { a: 'apsache', b: 'tira', f: 'r', t: 'l', k: 'flow', lb: 'bons' },
     { a: 'apsache', b: 'drypack', f: 'r', t: 'l', k: 'flow', lb: 'bons' },
     { a: 'apsache', b: 'refugo', f: 'b', t: 't', k: 'flow', lb: 'refugo' },
     { a: 'tira', b: 'apcaixa', f: 'r', t: 'l', k: 'flow', lb: '72 sachês por caixa' },
-    { a: 'mp', b: 'apcaixa', f: 'r', t: 'l', k: 'flow', lb: 'caixa, saco, abraçadeira', lt: 0.3, c1: [610, 435], c2: [900, 195] },
+    { a: 'mp', b: 'apcaixa', f: 'r', t: 'l', k: 'flow', lb: 'gancho, corda, caixa, saco', lt: 0.3, c1: [610, 435], c2: [900, 195] },
     { a: 'apcaixa', b: 'caixa', f: 'b', t: 't', k: 'flow' },
     { a: 'caixa', b: 'pronto', f: 'r', t: 'l', k: 'flow' },
     { a: 'drypack', b: 'pronto', f: 'r', t: 'l', k: 'flow', c1: [1222, 545], c2: [1222, 155] },
@@ -244,35 +246,38 @@ ol.passos b { font-weight: 600; }
     { a: 'pedido', b: 'nf', f: 'b', t: 't', k: 'flow' },
     { a: 'nf', b: 'cliente', f: 'b', t: 't', k: 'flow' },
     { a: 'contagem', b: 'mp', f: 'l', t: 'r', k: 'ctrl', lb: 'corrige', lt: 0.15, c1: [312, 875], c2: [312, 460] },
+    { a: 'contagem', b: 'cons', f: 'l', t: 'b', k: 'ctrl', lb: 'confere' },
     { a: 'virada', b: 'tira', f: 't', t: 'b', k: 'ctrl', lb: 'saldo inicial', lt: 0.35 },
-    { a: 'virada', b: 'pronto', f: 'r', t: 'r', k: 'ctrl', c1: [1505, 875], c2: [1505, 155] },
-    { a: 'virada', b: 'mp', f: 'l', t: 'l', k: 'ctrl', c1: [20, 940], c2: [12, 435] }
+    { a: 'virada', b: 'pronto', f: 'r', t: 'r', k: 'ctrl', c1: [1505, 875], c2: [1505, 155] }
   ];
 
   var D = [
     { n: 1, x: 700, y: 650, lb: 'Contador inclui o refugo?', alvo: 'apsache', ap: 'r', trava: 'A tela do chefe de produção',
       q: 'O contador da máquina conta o refugo junto?',
       p: 'Exemplo: a máquina selou 1.000 sachês e 20 saíram com defeito. Se o contador mostra 1.000, está certo como fiz (contador − refugo). Se mostra 980, o campo vira "Sachês bons".' },
-    { n: 2, x: 700, y: 150, lb: 'Individual leva gancho?', alvo: 'tira', ap: 't', trava: 'A ficha da caixa individual',
+    { n: 2, x: 1000, y: 62, lb: 'Gancho e corda: prontos?', alvo: 'apcaixa', ap: 't', trava: 'A ficha da caixa',
+      q: 'Gancho e cordinha são comprados prontos ou feitos aqui?',
+      p: 'Deixei 1 gancho e 1 corda por tira, baixando sozinhos na amarração. Mas em agosto arame e cordinha entraram no sistema como consumíveis de uso variável. O gancho vem pronto, por unidade, ou é feito aqui com arame? A cordinha vem cortada ou em rolo?' },
+    { n: 3, x: 1000, y: 112, lb: 'Individual leva gancho?', alvo: 'apcaixa', ap: 't', trava: 'A ficha da caixa individual',
       q: 'O sachê individual leva gancho e corda?',
-      p: 'A caixa de 72 individuais é uma tira de 1 sachê. Pela receita da família, iria 1 gancho e 1 corda por sachê, ou seja 72 de cada por caixa.' },
-    { n: 3, x: 700, y: 70, lb: 'Tyvek leva PET+PEBD?', alvo: 'maq', ap: 'r', trava: 'A ficha do Tyvek',
-      q: 'A receita Tyvek leva PET+PEBD?',
-      p: 'A planilha "Custo DRYBOX" põe 2,10 m² de PET+PEBD na caixa Tyvek. Mas o Tyvek com coating da Zermatt sela contra ele mesmo, sem filme na segunda face.' },
-    { n: 4, x: 75, y: 770, lb: 'Quem lança a volta da OFC?', alvo: 'ofc', ap: 'b', trava: 'O saldo das bobinas',
-      q: 'Quem lança a ida e a volta da bobina na OFC?',
-      p: 'A 785 mm crua sai do estoque e volta como duas de 375 mm impressas. Vem nota da OFC na volta? A logística confere na doca como qualquer entrada?' },
-    { n: 5, x: 1000, y: 520, lb: 'Dia do inventário?', alvo: 'virada', ap: 't', trava: 'A virada',
+      p: 'A caixa de 72 individuais é uma tira de 1 sachê. Pela receita, iria 1 gancho e 1 corda por sachê, ou seja 72 de cada por caixa.' },
+    { n: 4, x: 700, y: 95, lb: 'Quais tiras a máquina faz?', alvo: 'maq', ap: 'r', trava: 'Quais tiras cadastrar na virada',
+      q: 'Quais tiras a máquina faz hoje?',
+      p: 'Você falou de tira de 3 e de 6. No cadastro há também caixas de tiras de 4, de 9 tiras de 8 e de individuais. Ainda são feitas?' },
+    { n: 5, x: 75, y: 770, lb: 'Quem lança o consumível?', alvo: 'cons', ap: 'b', trava: 'A baixa manual',
+      q: 'Quem lança a saída do consumível, e quando?',
+      p: 'Hoje só o escritório e o chefe de produção lançam, em Lançamentos de Matéria-Prima. A logística deve ter um botão "Retirar consumível" no tablet, na hora em que entrega o item?' },
+    { n: 6, x: 1000, y: 520, lb: 'Dia do inventário?', alvo: 'virada', ap: 't', trava: 'A virada',
       q: 'Em que dia é o inventário?', p: 'Define até quando o sistema novo precisa estar no ar para receber a contagem.' },
-    { n: 6, x: 1000, y: 590, lb: 'Como contar sachê solto?', alvo: 'virada', ap: 't', trava: 'A virada',
+    { n: 7, x: 1000, y: 590, lb: 'Como contar sachê solto?', alvo: 'virada', ap: 't', trava: 'A virada',
       q: 'Como contar tira e sachê soltos no inventário?', p: 'Por unidade, por peso ou por caixa fechada? E a caixa aberta pela metade?' },
-    { n: 7, x: 700, y: 730, lb: 'Sexta conta tira e produto?', alvo: 'contagem', ap: 'r', trava: 'Nada; melhora a conferência',
-      q: 'A contagem de sexta passa a contar tira e produto pronto?', p: 'Hoje ela conta só matéria-prima. Recomendo que conte as três coisas: é o que pega erro de apontamento.' },
-    { n: 8, x: 1000, y: 660, lb: 'Qual domínio?', alvo: 'virada', ap: 't', trava: 'A virada',
+    { n: 8, x: 700, y: 730, lb: 'Sexta conta tira e produto?', alvo: 'contagem', ap: 'r', trava: 'Nada; melhora a conferência',
+      q: 'A contagem de sexta passa a contar tira e produto pronto?', p: 'Hoje ela conta só matéria-prima e consumível. Recomendo que conte também tira e produto pronto: é o que pega erro de apontamento.' },
+    { n: 9, x: 1000, y: 660, lb: 'Qual domínio?', alvo: 'virada', ap: 't', trava: 'A virada',
       q: 'Qual domínio para o sistema novo?', p: 'Recomendo um subdomínio do grfbrazil.com (ex.: sistema.grfbrazil.com), que você já usa em chat. e camara. Não precisa comprar nada.' },
-    { n: 9, x: 1000, y: 730, lb: 'Subir no painel.dev?', alvo: 'virada', ap: 't', trava: 'O teste no banco de verdade',
+    { n: 10, x: 1000, y: 730, lb: 'Subir no painel.dev?', alvo: 'virada', ap: 't', trava: 'O teste no banco de verdade',
       q: 'Posso subir o código no painel.dev?', p: 'É onde a atualização do banco roda em MySQL de verdade. Até agora ela só rodou no banco de teste (SQLite).' },
-    { n: 10, x: 1290, y: 800, lb: 'Nota entre as empresas', alvo: 'nf', ap: 'l', cont: true, trava: 'Assunto do contador',
+    { n: 11, x: 1290, y: 800, lb: 'Nota entre as empresas', alvo: 'nf', ap: 'l', cont: true, trava: 'Assunto do contador',
       q: 'Nota entre a GRF Brasil e a Dessecantes',
       p: 'No sistema o estoque é um só, mas o fiscal continua separado por CNPJ: quando uma empresa vende o que a outra fabricou, precisa de nota entre as duas.' }
   ];
